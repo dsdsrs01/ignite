@@ -1,0 +1,22 @@
+#Novo projeto prático
+  +Comecei instalando o StyledComponents: npm i styled-components
+  +npm i @types/styled-components -D
+
+#ESlint para padronizar os projetos
+ +npm i eslint -D
+ +npm i @rocketseat/eslint-config -D
+  -Cria um arquivo .eslintrc.json e dentro coloca
+  {
+  "extends":"@rocketseat/eslint-config/react"
+  }
++Para testar o ESLint: npx eslint src --ext .ts,.tsx
+                       npx eslint src --ext .ts,.tsx --fix :Resolve todos os erros de uma vez
+
+#ROTAS:
+   -React-Router: npm i react-router-dom 
+   -Criar um componente de rota para especificar quais as minhas rotas
+
+#ICONS: npm i phosphor-react
+
+#Biblioteca para trabalhar com formulario:
+  +npm i react-hook-form
