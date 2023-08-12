@@ -14,6 +14,7 @@ import {
   Separator,
   StartCountdownButton,
 } from './styles'
+import { useState } from 'react'
 // Contreolled: Mantem em tempo real a informacao do usuario guardada
 // Uncontrolled: So pega as informacoes quando for necessario
 
@@ -29,9 +30,19 @@ const newCycleFormValidationSchema = zod.object({
 
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+}
+
 export function Home() {
+  const [cycle, setCycle] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
   // register: recebe o nome do input e retorna metodos como onChange
-  const { register, handleSubmit, watch } = useForm<NewCycleFormData>({
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
       // Importante iniciar os valores zerados
@@ -41,8 +52,29 @@ export function Home() {
   })
 
   function handleCreateNewCycle(data: NewCycleFormData) {
-    console.log(data)
+    
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()), // Solucao para nao precisar baixar uma biblioteca para o id(temporaria)
+      task: data.task,
+      minutesAmount: data.minutesAmount
+    }
+
+    setCycle(state => [...state, newCycle]) // Adiciona uma nova informacao ao array, sempre que denpender de um formato anterior colocar no modelo de arrow function
+    setActiveCycleId(newCycle.id)
+
+    reset() // A funcao reset funciona resetando de acordo com os campos que eu coloquei no default value
   }
+
+  const activeCycle = cycle.find((cycle) => cycle.id == activeCycleId)
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+
+  const minutesAmount = Math.floor(currentSeconds / 60)
+  const secondsAmount = currentSeconds % 60
+
+  const minutes = String(minutesAmount).padStart(2, '0') // Preenche uma string ate um tamanho especifico
+  const seconds = String(secondsAmount).padStart(2, '0') // Preenche uma string ate um tamanho especifico
 
   const task = watch('task')
   const isSubmitDisabled = !task
@@ -80,11 +112,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         {/* Vou usar esse disabled para fazer uma condição dentro do styled components */}
